@@ -41,6 +41,10 @@ const finalCreateStore = compose(
 
 dispatching a firMiddleware action.
 
+- types: action constants types
+- ref: firebase reference
+- method: firebase get value method, support `once_value`, `once_child_added`, `once_child_changed`, `once_child_removed`, `once_child_moved`
+
 ```js
 const {CALL_FIR_API} = require('redux-firebase-middleware');
 
