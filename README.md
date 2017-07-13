@@ -91,6 +91,12 @@ export default function reducer(state: calcState = initialState, action: FSA) {
 }
 ```
 
+## Inspired
+
+This is highly inspired by `redux-api-middleware`
+
+https://github.com/agraboso/redux-api-middleware
+
 ## License
 
 Apache-2.0 © [chilijung](https://github.com/chilijung)
