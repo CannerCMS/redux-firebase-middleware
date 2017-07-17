@@ -63,6 +63,7 @@
   },
   "repository": "Canner/redux-firebase-middleware",
   "scripts": {
+    "preinstall": "use-yarn || yarn global add use-yarn",
     "prepublish": "gulp prepublish",
     "test": "gulp"
   },
