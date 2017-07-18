@@ -1,11 +1,11 @@
 {
   "name": "redux-firebase-middleware",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "redux middleware for firebase",
   "homepage": "",
   "author": {
     "name": "howardchi",
-    "email": "howardchi@fougood.com",
+    "email": "chilijung@gmail.com",
     "url": ""
   },
   "files": [
