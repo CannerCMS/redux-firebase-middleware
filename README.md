@@ -26,11 +26,11 @@ const config = {
   messagingSenderId: 'xxxxxxxxxxx',
 };
 
-const fir = firMiddleware(config);
+firebase.initializeApp(config).database();
 
 const finalCreateStore = compose(
   applyMiddleware(thunk),
-  applyMiddleware(fir) // -----> apply fir middleware in redux store
+  applyMiddleware(firMiddleware) // -----> apply fir middleware in redux store
 )(createStore);
 
 .....
