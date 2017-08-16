@@ -1,5 +1,5 @@
 # redux-firebase-middleware [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> redux middleware for firebase
+> redux middleware for firebase, support native web API or react-native-firebase API.
 
 ## Installation
 
@@ -13,7 +13,10 @@ $ npm install --save redux-firebase-middleware
 
 Setting up in your redux store
 
+##### Web
+
 ```js
+/** firebase web api **/
 const {applyMiddleware, createStore, compose} = require('redux');
 const {firMiddleware} = require('redux-firebase-middleware');
 
@@ -30,7 +33,27 @@ firebase.initializeApp(config).database();
 
 const finalCreateStore = compose(
   applyMiddleware(thunk),
-  applyMiddleware(firMiddleware) // -----> apply fir middleware in redux store
+  applyMiddleware(firMiddleware(firebase)) // -----> apply fir middleware in redux store
+)(createStore);
+
+```
+
+##### React-native
+
+```js
+/** react-native-firebase native api **/
+import RNFirebase from 'react-native-firebase';
+
+const configOpts = {
+  debug: true,
+  persistence: true,
+};
+
+RNFirebase.initializeApp(configOpts);
+
+const finalCreateStore = compose(
+  applyMiddleware(thunk),
+  applyMiddleware(firMiddleware(RNFirebase)) // -----> apply fir middleware in redux store
 )(createStore);
 
 .....
