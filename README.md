@@ -82,6 +82,19 @@ function callAnAction() {
 
 #### Constants
 
+##### Default payload
+
+`data.val()` will return as default.
+
+```js
+export const GET_CALC_CAR_CATEGORY = [
+  'GET_MY_REF_REQUEST', // -------> first, must be request type
+  'GET_MY_REF_SUCCESS', // -------> second, must be success type
+  'GET_MY_REF_FAILURE', // -------> third, must be failure type
+];
+```
+
+##### Customized payload
 
 ```js
 export const GET_CALC_CAR_CATEGORY = [
