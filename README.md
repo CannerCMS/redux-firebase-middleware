@@ -9,7 +9,7 @@ $ npm install --save redux-firebase-middleware
 
 ## Usage
 
-#### Store
+### Store
 
 Setting up in your redux store
 
@@ -60,7 +60,7 @@ const finalCreateStore = compose(
 
 ```
 
-#### dispatch action
+### action
 
 dispatching a firMiddleware action.
 
@@ -80,7 +80,7 @@ function callAnAction() {
 }
 ```
 
-#### Constants
+### Constants
 
 ##### Default payload
 
@@ -111,7 +111,7 @@ export const GET_CALC_CAR_CATEGORY = [
 ];
 ```
 
-#### Reducer
+### Reducer
 
 ```js
 export default function reducer(state: calcState = initialState, action: FSA) {
