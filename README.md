@@ -1,4 +1,6 @@
 # redux-firebase-middleware [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/Canner/redux-firebase-middleware.svg)](https://greenkeeper.io/)
 > redux middleware for firebase, support native web API or react-native-firebase API.
 
 ## Installation
