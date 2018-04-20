@@ -1,8 +1,8 @@
 export default {
-  apiKey: "AIzaSyDgABupweYR8BXMzrS46CwBzPmZIcQK8g4",
-  authDomain: "redux-firebase-middleware.firebaseapp.com",
-  databaseURL: "https://redux-firebase-middleware.firebaseio.com",
-  projectId: "redux-firebase-middleware",
-  storageBucket: "redux-firebase-middleware.appspot.com",
-  messagingSenderId: "472378750661"
+  apiKey: "AIzaSyDxmSl_0K25pDo348ULutKWSY1oE3YpGGk",
+  authDomain: "redux-firebase-middlewar-f33ca.firebaseapp.com",
+  databaseURL: "https://redux-firebase-middlewar-f33ca.firebaseio.com",
+  projectId: "redux-firebase-middlewar-f33ca",
+  storageBucket: "",
+  messagingSenderId: "717467757462"
 };

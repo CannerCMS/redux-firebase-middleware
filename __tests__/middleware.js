@@ -3,6 +3,7 @@ import CALL_FIR_API from '../src/CALL_FIR_API';
 import firConfig from './config';
 import firebase from 'firebase';
 
+jest.setTimeout(10000);
 firebase.initializeApp(firConfig)
 
 describe('firMiddleware must be a Redux middleware', () => {
@@ -287,3 +288,112 @@ describe('firMiddleware must dispatch an error request when FirAction have wrong
 })
 
 
+describe('firMiddleware get value once', () => {
+  test('get the `/test` value once', done => {
+    firebase.database().ref('test').set({hello: 'world'})
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'once_value'
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        expect(action.payload.val()).toEqual({hello: 'world'});
+        done();
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+})
+
+describe('firMiddleware `set` value', () => {
+  test('set the `/test` value with {foo: "bar"}', done => {
+    firebase.database().ref('test').set({hello: 'world'})
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'set',
+        content: {foo: "bar"}
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        firebase.database().ref('test').once('value')
+          .then(dataSnapshot => {
+            expect(dataSnapshot.val()).toEqual({foo: 'bar'});
+            done();
+          })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+})
+
+describe('firMiddleware `update` value', () => {
+  test('update the `/test` value with {foo: "bar"}', done => {
+    firebase.database().ref('test').set({hello: 'world'})
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'update',
+        content: {foo: "bar"}
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        firebase.database().ref('test').once('value')
+          .then(dataSnapshot => {
+            expect(dataSnapshot.val()).toEqual({
+              foo: 'bar',
+              hello: 'world'
+            });
+            done();
+          })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+})
+
+describe('firMiddleware `remove` value', () => {
+  test('remove the `/test` value with {foo: "bar"}', done => {
+    firebase.database().ref('test').set({hello: 'world'})
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'remove'
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        firebase.database().ref('test').once('value')
+          .then(dataSnapshot => {
+            expect(dataSnapshot.val()).toEqual(null);
+            done();
+          })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+})

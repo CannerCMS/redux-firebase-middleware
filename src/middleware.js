@@ -36,7 +36,7 @@ export default (firebase: any) => {
       }
 
       const callFIR = action[CALL_FIR_API];
-      const { types, ref, method } = callFIR;
+      const { types, ref, method, content = {}} = callFIR;
       const [requestType, successType, failureType] = normalizeTypeDescriptors(
         types
       );
@@ -49,25 +49,34 @@ export default (firebase: any) => {
           // trigger firebase methods, get, set ...etc operations.
           case "once_value":
             res = await ref(db).once("value");
+            return next(await actionWith(successType, [action, getState(), res]));
+          case "set":
+            res = await ref(db).set(content);
+            return next(await actionWith(successType, [action, getState(), res]));
+          case "update":
+            res = await ref(db).update(content);
+            return next(await actionWith(successType, [action, getState(), res]));
+          case "remove":
+            res = await ref(db).remove();
+            return next(await actionWith(successType, [action, getState(), res]));
+          case "on_value":
+            res = await ref(db).on("value");
             break;
-          case "once_child_added":
-            res = await ref(db).once("child_added");
+          case "on_child_added":
+            res = await ref(db).on("child_added");
             break;
-          case "once_child_changed":
-            res = await ref(db).once("child_changed");
+          case "on_child_changed":
+            res = await ref(db).on("child_changed");
             break;
-          case "once_child_removed":
-            res = await ref(db).once("child_removed");
+          case "on_child_removed":
+            res = await ref(db).on("child_removed");
             break;
-          case "once_child_moved":
-            res = await ref(db).once("child_moved");
+          case "on_child_moved":
+            res = await ref(db).on("child_moved");
             break;
           default:
-            res = await ref(db).once("value");
-            break;
+            throw new Error('Invalid method: ', method);
         }
-
-        return next(await actionWith(successType, [action, getState(), res]));
       } catch (e) {
         // The request was malformed, or there was a network error
         return next(

@@ -19,7 +19,7 @@ export function normalizeTypeDescriptors(reqTypes: any) {
   }
 
   successType = {
-    payload: (action: FSA, state: GetState, res: any) => res.val(),
+    payload: (action: FSA, state: GetState, res: any) => res,
     ...successType
   };
 
@@ -29,7 +29,7 @@ export function normalizeTypeDescriptors(reqTypes: any) {
   }
 
   failureType = {
-    payload: (action: FSA, state: GetState, res: any) => res.val(),
+    payload: (action: FSA, state: GetState, res: any) => res,
     ...failureType
   };
 

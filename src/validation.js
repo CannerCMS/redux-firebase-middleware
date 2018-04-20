@@ -36,14 +36,18 @@ export function isValidTypeDescriptor(obj: TypeDescriptor) {
 export function validateFirAction(action: FirAPI) {
   var validationErrors = [];
   const db = firebase.database();
-  const validCallAPIKeys = ["ref", "method", "types"];
+  const validCallAPIKeys = ["ref", "method", "types", "content"];
 
   const validMethods = [
     "once_value",
-    "once_child_added",
-    "once_child_changed",
-    "once_child_removed",
-    "once_child_moved"
+    "set",
+    "update",
+    "remove",
+    "on_value",
+    "on_child_added",
+    "on_child_changed",
+    "on_child_removed",
+    "on_child_moved"
   ];
 
   if (!isFirAction(action)) {
