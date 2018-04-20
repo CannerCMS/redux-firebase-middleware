@@ -36,7 +36,7 @@ export function normalizeTypeDescriptors(reqTypes: any) {
   return [requestType, successType, failureType];
 }
 
-export async function actionWith(descriptor: FSA, args: Array<mixed>) {
+export async function actionWith(descriptor: FSA, args: Array<mixed>, off) {
   try {
     descriptor.payload = await (typeof descriptor.payload === "function"
       ? descriptor.payload(...args)
@@ -45,5 +45,10 @@ export async function actionWith(descriptor: FSA, args: Array<mixed>) {
     descriptor.payload = new InternalError(e.message);
     descriptor.error = true;
   }
+
+  if (off) {
+    descriptor.off = off;
+  }
+
   return descriptor;
 }

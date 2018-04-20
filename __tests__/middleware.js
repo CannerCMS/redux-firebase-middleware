@@ -397,3 +397,60 @@ describe('firMiddleware `remove` value', () => {
     actionHandler(anAction);
   });
 })
+
+describe('firMiddleware `on_value` listen new values', () => {
+  test('`/test` value with {foo: "bar"}', done => {
+    firebase.database().ref('test').set({hello: 'world'})
+    let updateValueTest = false
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'on_value'
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS' && !updateValueTest) {
+        updateValueTest = true
+        firebase.database().ref('test').update({foo: 'bar'})
+      } else if (action.type === 'SUCCESS' && updateValueTest) {
+        expect(action.payload.val()).toEqual({ foo: 'bar', hello: 'world' });
+        action.off();
+        done();
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+
+  test('`/test` listen value and unsubscribe', done => {
+    firebase.database().ref('test').set({hello: 'world'})
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'on_value'
+      }
+    };
+    const doGetState = () => {};
+    const testCall = jest.fn();
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        testCall();
+        action.off();
+        firebase.database().ref('test').update({foo: 'bar'})
+          .then(() => {
+            expect(testCall).toHaveBeenCalledTimes(1);
+            done();
+          })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+})

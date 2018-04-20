@@ -42,37 +42,45 @@ export default (firebase: any) => {
       );
 
       next(await actionWith(requestType, [action, getState()]));
-      let res;
+      let dataSnapshot;
 
       try {
         switch (method) {
           // trigger firebase methods, get, set ...etc operations.
           case "once_value":
-            res = await ref(db).once("value");
-            return next(await actionWith(successType, [action, getState(), res]));
+            dataSnapshot = await ref(db).once("value");
+            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
           case "set":
-            res = await ref(db).set(content);
-            return next(await actionWith(successType, [action, getState(), res]));
+            dataSnapshot = await ref(db).set(content);
+            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
           case "update":
-            res = await ref(db).update(content);
-            return next(await actionWith(successType, [action, getState(), res]));
+            dataSnapshot = await ref(db).update(content);
+            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
           case "remove":
-            res = await ref(db).remove();
-            return next(await actionWith(successType, [action, getState(), res]));
+            dataSnapshot = await ref(db).remove();
+            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
           case "on_value":
-            res = await ref(db).on("value");
-            break;
+            const cb = async (dataSnapshot) => {
+              const newSuccessType = Object.assign({}, successType);
+              next(
+                await actionWith(newSuccessType, [action, getState(), dataSnapshot],
+                () => ref(db).off('value', cb))
+              )
+            };
+
+            ref(db).on("value", cb);
+            return;
           case "on_child_added":
-            res = await ref(db).on("child_added");
+            dataSnapshot = await ref(db).on("child_added");
             break;
           case "on_child_changed":
-            res = await ref(db).on("child_changed");
+            dataSnapshot = await ref(db).on("child_changed");
             break;
           case "on_child_removed":
-            res = await ref(db).on("child_removed");
+            dataSnapshot = await ref(db).on("child_removed");
             break;
           case "on_child_moved":
-            res = await ref(db).on("child_moved");
+            dataSnapshot = await ref(db).on("child_moved");
             break;
           default:
             throw new Error('Invalid method: ', method);
@@ -86,7 +94,7 @@ export default (firebase: any) => {
               payload: new RequestError(e.message),
               error: true
             },
-            [action, getState(), res]
+            [action, getState(), dataSnapshot]
           )
         );
       }  
