@@ -1,9 +1,7 @@
 {
     "presets": [
-        "flow",
-        "airbnb"
-    ],
-    "plugins": [
-        "transform-async-to-generator"
+      "env",
+      "flow",
+      "stage-0"
     ]
-}
+  }

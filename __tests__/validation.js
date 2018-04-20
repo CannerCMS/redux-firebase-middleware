@@ -5,9 +5,9 @@ import {
   isValidTypeDescriptor,
   validateFirAction,
   isValidateFirAction,
-} from '../lib/validation';
+} from '../src/validation';
 
-import CALL_FIR_API from '../lib/CALL_FIR_API';
+import CALL_FIR_API from '../src/CALL_FIR_API';
 
 describe('validate FIR actions', () => {
   it('should fail passing none object value', () => {
