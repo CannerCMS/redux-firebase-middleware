@@ -9,16 +9,18 @@
     "url": ""
   },
   "files": [
-    "dist"
+    "lib"
   ],
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "keywords": [
     "redux",
     "firebase",
     "middleware"
   ],
   "jest": {
-    "testPathIgnorePatterns": ["<rootDir>/__tests__/config.js"]
+    "testPathIgnorePatterns": [
+      "<rootDir>/__tests__/config.js"
+    ]
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -37,6 +39,7 @@
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-flowtype": "^2.46.1",
     "eslint-plugin-prettier": "^2.6.0",
+    "firebase": "^4.13.0",
     "flow-bin": "^0.68.0",
     "flow-copy-source": "^1.3.0",
     "jest": "22.4.2",
@@ -51,7 +54,8 @@
     "build": "npm run build:commonjs && npm run build:flow",
     "prepublish": "npm run clean && npm run check:src && npm run build",
     "check:src": "npm run lint",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "license": "Apache-2.0",
   "dependencies": {

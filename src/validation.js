@@ -70,23 +70,30 @@ export function validateFirAction(action: FirAPI) {
   }
 
   const { ref, method, types } = callAPI;
+
+  // check if `ref` property is valid
   if (typeof ref === "undefined") {
-    validationErrors.push("[CALL_API] must have an ref property");
+    validationErrors.push("[CALL_API].ref property must have an ref property");
   } else if (typeof ref !== "string" && typeof ref !== "function") {
     validationErrors.push(
       "[CALL_API].ref property must be a string or a function"
     );
+  } else if (typeof ref !== "function") {
+    validationErrors.push("[CALL_API].ref property must be a function");
   }
+
+  // check if `method` property is valid
   if (typeof method === "undefined") {
-    validationErrors.push("[CALL_API] must have a method property");
+    validationErrors.push("[CALL_API].method must have a method property");
   } else if (typeof method !== "string") {
     validationErrors.push("[CALL_API].method property must be a string");
   } else if (!~validMethods.indexOf(method)) {
     validationErrors.push(`Invalid [CALL_API].method: ${method}`);
   }
 
+  // check if `types` property is valid
   if (typeof types === "undefined") {
-    validationErrors.push("[CALL_API] must have a types property");
+    validationErrors.push("[CALL_API].types must have a types property");
   } else if (!Array.isArray(types) || types.length !== 3) {
     validationErrors.push(
       "[CALL_API].types property must be an array of length 3"

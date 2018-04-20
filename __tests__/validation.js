@@ -1,4 +1,3 @@
-import expect from 'expect';
 import Symbol from 'es6-symbol';
 import {
   isFirAction,
