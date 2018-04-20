@@ -36,54 +36,77 @@ export default (firebase: any) => {
       }
 
       const callFIR = action[CALL_FIR_API];
-      const { types, ref, method, content = {}} = callFIR;
+      const { types, ref, method, content = {} } = callFIR;
       const [requestType, successType, failureType] = normalizeTypeDescriptors(
         types
       );
 
       next(await actionWith(requestType, [action, getState()]));
-      let dataSnapshot;
 
+      // listener method
+      function listenerMethods(type) {
+        const cb = async (dataSnapshot, prevChildKey) => {
+          const newSuccessType = Object.assign({}, successType);
+          if (type === 'child_added' || type === 'child_changed' || type === 'child_moved') {
+            dataSnapshot = {
+              childSnapshot: dataSnapshot,
+              prevChildKey
+            };
+          }
+
+          next(
+            await actionWith(
+              newSuccessType,
+              [action, getState(), dataSnapshot],
+              () => ref(db).off(type, cb)
+            )
+          );
+        };
+
+        ref(db).on(type, cb);
+      }
+
+      let dataSnapshot;
       try {
         switch (method) {
           // trigger firebase methods, get, set ...etc operations.
           case "once_value":
             dataSnapshot = await ref(db).once("value");
-            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
+            return next(
+              await actionWith(successType, [action, getState(), dataSnapshot])
+            );
           case "set":
             dataSnapshot = await ref(db).set(content);
-            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
+            return next(
+              await actionWith(successType, [action, getState(), dataSnapshot])
+            );
           case "update":
             dataSnapshot = await ref(db).update(content);
-            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
+            return next(
+              await actionWith(successType, [action, getState(), dataSnapshot])
+            );
           case "remove":
             dataSnapshot = await ref(db).remove();
-            return next(await actionWith(successType, [action, getState(), dataSnapshot]));
+            return next(
+              await actionWith(successType, [action, getState(), dataSnapshot])
+            );
           case "on_value":
-            const cb = async (dataSnapshot) => {
-              const newSuccessType = Object.assign({}, successType);
-              next(
-                await actionWith(newSuccessType, [action, getState(), dataSnapshot],
-                () => ref(db).off('value', cb))
-              )
-            };
-
-            ref(db).on("value", cb);
+            listenerMethods("value");
             return;
           case "on_child_added":
-            dataSnapshot = await ref(db).on("child_added");
+            listenerMethods("child_added");
             break;
           case "on_child_changed":
-            dataSnapshot = await ref(db).on("child_changed");
+            listenerMethods("child_changed");
             break;
           case "on_child_removed":
-            dataSnapshot = await ref(db).on("child_removed");
+            listenerMethods("child_removed");
             break;
           case "on_child_moved":
-            dataSnapshot = await ref(db).on("child_moved");
+            listenerMethods("child_moved");
             break;
           default:
-            throw new Error('Invalid method: ', method);
+            throw new Error("Invalid method: ", method);
         }
       } catch (e) {
         // The request was malformed, or there was a network error
@@ -97,7 +120,7 @@ export default (firebase: any) => {
             [action, getState(), dataSnapshot]
           )
         );
-      }  
+      }
     })();
   };
 };

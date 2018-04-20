@@ -3,5 +3,8 @@
       "env",
       "flow",
       "stage-0"
+    ],
+    "plugins": [
+      "transform-object-assign"
     ]
   }

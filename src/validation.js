@@ -4,7 +4,7 @@
 
 import CALL_FIR_API from "./CALL_FIR_API";
 import isPlainObject from "lodash.isplainobject";
-import firebase from 'firebase';
+import firebase from "firebase";
 import type { FirAPI, TypeDescriptor } from "./types";
 
 export function isFirAction(action: FirAPI) {
@@ -86,8 +86,13 @@ export function validateFirAction(action: FirAPI) {
     );
   } else if (typeof ref !== "function") {
     validationErrors.push("[CALL_API].ref property must be a function");
-  } else if (typeof ref === "function" && !(ref(db) instanceof firebase.database.Reference)) {
-    validationErrors.push("[CALL_API].ref property must be an instance of firebase.database.Reference");
+  } else if (
+    typeof ref === "function" &&
+    !(ref(db) instanceof firebase.database.Reference)
+  ) {
+    validationErrors.push(
+      "[CALL_API].ref property must be an instance of firebase.database.Reference"
+    );
   }
 
   // check if `method` property is valid
@@ -96,7 +101,11 @@ export function validateFirAction(action: FirAPI) {
   } else if (typeof method !== "string") {
     validationErrors.push("[CALL_API].method property must be a string");
   } else if (!~validMethods.indexOf(method)) {
-    validationErrors.push(`Invalid [CALL_API].method: ${method}, must be one of ${validMethods.join(', ')}`);
+    validationErrors.push(
+      `Invalid [CALL_API].method: ${method}, must be one of ${validMethods.join(
+        ", "
+      )}`
+    );
   }
 
   // check if `types` property is valid
