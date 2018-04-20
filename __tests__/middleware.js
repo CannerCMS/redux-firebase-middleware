@@ -130,8 +130,160 @@ describe('firMiddleware must pass valid request `types`', () => {
       done();
     }, 200);
   });
+
+  test('method must defined', done => {
+    const anAction = {
+      [CALL_FIR_API]: {
+        ref: (db) => db.ref()
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = () => {
+      throw Error('next handler called');
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+    setTimeout(() => {
+      done();
+    }, 200);
+  });
 })
 
+describe('firMiddleware must dispatch an error request when FirAction have wrong ref type', () => {
+  test('ref must defined', done => {
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        method: "once_value"
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      expect(action.type).toBe('REQUEST');
+      expect(action.payload.name).toBe('InvalidFirAction');
+      expect(action.payload.validationErrors[0]).toBe('[CALL_API].ref property must have an ref property');
+      expect(action.error).toBe(true);
+      done();
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
 
+  test('ref type is a string which is invalid', done => {
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: "/test",
+        method: "once_value"
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      expect(action.type).toBe('REQUEST');
+      expect(action.payload.name).toBe('InvalidFirAction');
+      expect(action.payload.validationErrors[0]).toBe('[CALL_API].ref property must be a function');
+      expect(action.error).toBe(true);
+      done();
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+
+  test('ref type return type is not firebase.database.Reference', done => {
+    // https://firebase.google.com/docs/reference/js/firebase.database.Reference
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: () => 'test',
+        method: "once_value"
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      expect(action.type).toBe('REQUEST');
+      expect(action.payload.name).toBe('InvalidFirAction');
+      expect(action.payload.validationErrors[0]).toBe('[CALL_API].ref property must be an instance of firebase.database.Reference');
+      expect(action.error).toBe(true);
+      done();
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+})
+
+describe('firMiddleware must dispatch an error request when FirAction have wrong `method` type', () => {
+  test('method must defined', done => {
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref()
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      expect(action.type).toBe('REQUEST');
+      expect(action.payload.name).toBe('InvalidFirAction');
+      expect(action.payload.validationErrors[0]).toBe('[CALL_API].method must have a method property');
+      expect(action.error).toBe(true);
+      done();
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+
+  test('method type must be one of the method types', done => {
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref(),
+        method: "test"
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      expect(action.type).toBe('REQUEST');
+      expect(action.payload.name).toBe('InvalidFirAction');
+      expect(action.payload.validationErrors[0]).toMatch('Invalid [CALL_API].method: test, must be one of');
+      expect(action.error).toBe(true);
+      done();
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+
+  test('method must be a string', done => {
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref(),
+        method: false
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      expect(action.type).toBe('REQUEST');
+      expect(action.payload.name).toBe('InvalidFirAction');
+      expect(action.payload.validationErrors[0]).toBe('[CALL_API].method property must be a string');
+      expect(action.error).toBe(true);
+      done();
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+})
 
 
