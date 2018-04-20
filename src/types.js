@@ -10,14 +10,14 @@ export type FSA = {
 
 export type TypeDescriptor = {
   type: string,
-  payload?: ?any,
-}
+  payload?: ?any
+};
 
 export type FirAPI = {
   [symbolApi: any]: {
     types: [string, string, string],
     ref: string,
-    method?: string,
+    method?: string
   }
 };
 

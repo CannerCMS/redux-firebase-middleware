@@ -17,6 +17,9 @@
     "firebase",
     "middleware"
   ],
+  "jest": {
+    "testPathIgnorePatterns": ["<rootDir>/__tests__/config.js"]
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -44,7 +47,7 @@
     "lint": "prettier --write ./src/**/*.js && eslint src test",
     "clean": "rimraf lib dist",
     "build:flow": "flow-copy-source -v -i '**/test/**' src lib",
-    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+    "build:commonjs": "babel src --out-dir lib",
     "build": "npm run build:commonjs && npm run build:flow",
     "prepublish": "npm run clean && npm run check:src && npm run build",
     "check:src": "npm run lint",
@@ -52,6 +55,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "es6-symbol": "^3.1.1"
+    "es6-symbol": "^3.1.1",
+    "lodash.isplainobject": "^4.0.6"
   }
 }

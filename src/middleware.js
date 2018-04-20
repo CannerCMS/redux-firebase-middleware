@@ -2,14 +2,14 @@
  * @flow
  */
 
-import type {FirAPI} from './types';
-import CALL_FIR_API from './CALL_FIR_API';
-import {isFirAction, validateFirAction} from './validation';
-import {RequestError, InvalidFirAction} from './errors';
-import {actionWith, normalizeTypeDescriptors} from './utils';
+import type { FirAPI } from "./types";
+import CALL_FIR_API from "./CALL_FIR_API";
+import { isFirAction, validateFirAction } from "./validation";
+import { RequestError, InvalidFirAction } from "./errors";
+import { actionWith, normalizeTypeDescriptors } from "./utils";
 
 export function firMiddleware(firebase: any) {
-  return ({getState}: any) => (next: Function) => async (action: FirAPI) => {
+  return ({ getState }: any) => (next: Function) => async (action: FirAPI) => {
     const db = firebase.database();
     if (!isFirAction(action)) {
       // if it is not a FirAction go to the next middleware
@@ -35,52 +35,50 @@ export function firMiddleware(firebase: any) {
     }
 
     const callFIR = action[CALL_FIR_API];
-    const {types, ref, method} = callFIR;
-    const [requestType, successType, failureType] = normalizeTypeDescriptors(types);
+    const { types, ref, method } = callFIR;
+    const [requestType, successType, failureType] = normalizeTypeDescriptors(
+      types
+    );
 
-    next(await actionWith(
-      requestType,
-      [action, getState()]
-    ));
+    next(await actionWith(requestType, [action, getState()]));
     let res;
 
     try {
       switch (method) {
         // trigger firebase methods, get, set ...etc operations.
-        case 'once_value':
-          res = await db.ref(ref).once('value');
+        case "once_value":
+          res = await db.ref(ref).once("value");
           break;
-        case 'once_child_added':
-          res = await db.ref(ref).once('child_added');
+        case "once_child_added":
+          res = await db.ref(ref).once("child_added");
           break;
-        case 'once_child_changed':
-          res = await db.ref(ref).once('child_changed');
+        case "once_child_changed":
+          res = await db.ref(ref).once("child_changed");
           break;
-        case 'once_child_removed':
-          res = await db.ref(ref).once('child_removed');
+        case "once_child_removed":
+          res = await db.ref(ref).once("child_removed");
           break;
-        case 'once_child_moved':
-          res = await db.ref(ref).once('child_moved');
+        case "once_child_moved":
+          res = await db.ref(ref).once("child_moved");
           break;
         default:
-          res = await db.ref(ref).once('value');
+          res = await db.ref(ref).once("value");
           break;
       }
 
-      return next(await actionWith(
-        successType,
-        [action, getState(), res]
-      ));
+      return next(await actionWith(successType, [action, getState(), res]));
     } catch (e) {
       // The request was malformed, or there was a network error
-      return next(await actionWith(
-        {
-          ...failureType,
-          payload: new RequestError(e.message),
-          error: true,
-        },
-        [action, getState(), res]
-      ));
+      return next(
+        await actionWith(
+          {
+            ...failureType,
+            payload: new RequestError(e.message),
+            error: true
+          },
+          [action, getState(), res]
+        )
+      );
     }
-  }
+  };
 }

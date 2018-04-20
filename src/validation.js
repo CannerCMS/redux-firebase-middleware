@@ -2,19 +2,16 @@
  * @flow
  */
 
-import CALL_FIR_API from './CALL_FIR_API';
-import {isPlainObject} from 'lodash';
-import type {FirAPI, TypeDescriptor} from './types';
+import CALL_FIR_API from "./CALL_FIR_API";
+import isPlainObject from "lodash.isplainobject";
+import type { FirAPI, TypeDescriptor } from "./types";
 
 export function isFirAction(action: FirAPI) {
   return isPlainObject(action) && action.hasOwnProperty(CALL_FIR_API);
 }
 
 export function isValidTypeDescriptor(obj: TypeDescriptor) {
-  const validKeys = [
-    'type',
-    'payload'
-  ]
+  const validKeys = ["type", "payload"];
 
   if (!isPlainObject(obj)) {
     return false;
@@ -24,11 +21,11 @@ export function isValidTypeDescriptor(obj: TypeDescriptor) {
       return false;
     }
   }
-  if (!('type' in obj)) {
+  if (!("type" in obj)) {
     return false;
 
-  // $FlowFixMe symbol
-  } else if (typeof obj.type !== 'string' && typeof obj.type !== 'symbol') {
+    // $FlowFixMe symbol
+  } else if (typeof obj.type !== "string" && typeof obj.type !== "symbol") {
     return false;
   }
 
@@ -37,22 +34,20 @@ export function isValidTypeDescriptor(obj: TypeDescriptor) {
 
 export function validateFirAction(action: FirAPI) {
   var validationErrors = [];
-  const validCallAPIKeys = [
-    'ref',
-    'method',
-    'types'
-  ];
+  const validCallAPIKeys = ["ref", "method", "types"];
 
   const validMethods = [
-    'once_value',
-    'once_child_added',
-    'once_child_changed',
-    'once_child_removed',
-    'once_child_moved'
+    "once_value",
+    "once_child_added",
+    "once_child_changed",
+    "once_child_removed",
+    "once_child_moved"
   ];
 
   if (!isFirAction(action)) {
-    validationErrors.push('FirAction must be plain JavaScript objects with a [CALL_FIR_API] property');
+    validationErrors.push(
+      "FirAction must be plain JavaScript objects with a [CALL_FIR_API] property"
+    );
     return validationErrors;
   }
 
@@ -64,7 +59,9 @@ export function validateFirAction(action: FirAPI) {
 
   const callAPI = action[CALL_FIR_API];
   if (!isPlainObject(callAPI)) {
-    validationErrors.push('[CALL_FIR_API] property must be a plain JavaScript object');
+    validationErrors.push(
+      "[CALL_FIR_API] property must be a plain JavaScript object"
+    );
   }
   for (let key in callAPI) {
     if (!~validCallAPIKeys.indexOf(key)) {
@@ -73,37 +70,53 @@ export function validateFirAction(action: FirAPI) {
   }
 
   const { ref, method, types } = callAPI;
-  if (typeof ref === 'undefined') {
-    validationErrors.push('[CALL_API] must have an ref property');
-  } else if (typeof ref !== 'string' && typeof ref !== 'function') {
-    validationErrors.push('[CALL_API].ref property must be a string or a function');
+  if (typeof ref === "undefined") {
+    validationErrors.push("[CALL_API] must have an ref property");
+  } else if (typeof ref !== "string" && typeof ref !== "function") {
+    validationErrors.push(
+      "[CALL_API].ref property must be a string or a function"
+    );
   }
-  if (typeof method === 'undefined') {
-    validationErrors.push('[CALL_API] must have a method property');
-  } else if (typeof method !== 'string') {
-    validationErrors.push('[CALL_API].method property must be a string');
+  if (typeof method === "undefined") {
+    validationErrors.push("[CALL_API] must have a method property");
+  } else if (typeof method !== "string") {
+    validationErrors.push("[CALL_API].method property must be a string");
   } else if (!~validMethods.indexOf(method)) {
     validationErrors.push(`Invalid [CALL_API].method: ${method}`);
   }
 
-  if (typeof types === 'undefined') {
-    validationErrors.push('[CALL_API] must have a types property');
+  if (typeof types === "undefined") {
+    validationErrors.push("[CALL_API] must have a types property");
   } else if (!Array.isArray(types) || types.length !== 3) {
-    validationErrors.push('[CALL_API].types property must be an array of length 3');
+    validationErrors.push(
+      "[CALL_API].types property must be an array of length 3"
+    );
   } else {
     const [requestType, successType, failureType] = types;
 
     // $FlowFixMe symbol
-    if (typeof requestType !== 'string' && typeof requestType !== 'symbol' && !isValidTypeDescriptor(requestType)) {
-      validationErrors.push('Invalid request type');
+    if (
+      typeof requestType !== "string" &&
+      typeof requestType !== "symbol" &&
+      !isValidTypeDescriptor(requestType)
+    ) {
+      validationErrors.push("Invalid request type");
     }
     // $FlowFixMe symbol
-    if (typeof successType !== 'string' && typeof successType !== 'symbol' && !isValidTypeDescriptor(successType)) {
-      validationErrors.push('Invalid success type');
+    if (
+      typeof successType !== "string" &&
+      typeof successType !== "symbol" &&
+      !isValidTypeDescriptor(successType)
+    ) {
+      validationErrors.push("Invalid success type");
     }
     // $FlowFixMe symbol
-    if (typeof failureType !== 'string' && typeof failureType !== 'symbol' && !isValidTypeDescriptor(failureType)) {
-      validationErrors.push('Invalid failure type');
+    if (
+      typeof failureType !== "string" &&
+      typeof failureType !== "symbol" &&
+      !isValidTypeDescriptor(failureType)
+    ) {
+      validationErrors.push("Invalid failure type");
     }
   }
 

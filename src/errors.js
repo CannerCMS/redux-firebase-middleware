@@ -8,8 +8,8 @@
 export class InvalidFirAction extends Error {
   constructor(validationErrors) {
     super();
-    this.name = 'InvalidFirAction';
-    this.message = 'Invalid FirAction';
+    this.name = "InvalidFirAction";
+    this.message = "Invalid FirAction";
     this.validationErrors = validationErrors;
   }
 }
@@ -24,7 +24,7 @@ export class InvalidFirAction extends Error {
 export class InternalError extends Error {
   constructor(message) {
     super();
-    this.name = 'InternalError';
+    this.name = "InternalError";
     this.message = message;
   }
 }
@@ -39,7 +39,7 @@ export class InternalError extends Error {
 export class RequestError extends Error {
   constructor(message) {
     super();
-    this.name = 'RequestError';
+    this.name = "RequestError";
     this.message = message;
   }
 }
