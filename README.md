@@ -1,6 +1,8 @@
 # redux-firebase-middleware [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > Redux middleware for firebase, support native web API or react-native-firebase API.
 
+**NOTE: Now only support for Firebase realtime database, welcome PRs for supporting Firestore**
+
 ## Installation
 
 ```sh
