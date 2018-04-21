@@ -1,7 +1,7 @@
 # redux-firebase-middleware [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > Redux middleware for firebase, support native web API or react-native-firebase API.
 
-**NOTE: Now only support for Firebase realtime database, welcome PRs for supporting Firestore**
+**NOTE: Only support for Firebase realtime database at this moment, welcome PRs for supporting Firestore**
 
 ## Installation
 
@@ -146,6 +146,15 @@ function callAnAction() {
 To remove the listener, you'll get `off` method in actions' reducer.
 
 ***Reducers***
+
+When the state is successful it'll received data as payload, payload's value is slightly different in different methods.
+
+Payload in methods:
+  * `on_value`: dataSnapshot
+  * `on_child_added`: `{childSnapshot, prevChildKey}`
+  * `on_child_changed`: `{childSnapshot, prevChildKey}`
+  * `on_child_removed`: oldChildSnapshot
+  * `on_child_moved`: `{childSnapshot, prevChildKey}`
 
 ```js
 export default function reducer(state: calcState = initialState, action: FSA) {
