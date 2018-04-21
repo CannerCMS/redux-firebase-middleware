@@ -603,13 +603,140 @@ describe('firMiddleware `on_child_changed` listen new values', () => {
       });
   });
 
-  // test('`/test` listen value and unsubscribe', done => {
-  //   firebase.database().ref('test').set({hello: 'world'})
+  test('`/test` listen value and unsubscribe', done => {
+    firebase.database().ref('test').set({hello: 'world'})
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'on_child_changed'
+      }
+    };
+    const doGetState = () => {};
+    const testCall = jest.fn();
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        testCall();
+        action.off();
+        firebase.database().ref('test/hello').update({foo: 'bar2'})
+          .then(() => {
+            expect(testCall).toHaveBeenCalledTimes(1);
+            done();
+          })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction)
+      .then(() => {
+        firebase.database().ref('test/hello').update({foo: 'bar'})
+      });
+  });
+})
+
+describe('firMiddleware `on_child_removed` listen new values', () => {
+  test('listen ref `/test` for removed value with {foo: "bar"}', done => {
+    firebase.database().ref('test').set({
+      hello: 'world',
+      foo: 'bar'
+    })
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'on_child_removed'
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        expect(action.payload.val()).toEqual("bar");
+        action.off();
+        done();
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+
+    actionHandler(anAction)
+      .then(() => {
+        firebase.database().ref('test/foo').remove()
+      });
+  });
+
+  test('`/test` listen child_removed and unsubscribe', done => {
+    firebase.database().ref('test').set({
+      hello: 'world',
+      foo: "bar"
+    })
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test'),
+        method: 'on_child_removed'
+      }
+    };
+    const doGetState = () => {};
+    const testCall = jest.fn();
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        testCall();
+        action.off();
+        firebase.database().ref('test/foo').remove()
+          .then(() => {
+            expect(testCall).toHaveBeenCalledTimes(1);
+            done();
+          })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction)
+      .then(() => {
+        firebase.database().ref('test/hello').remove()
+      });
+  });
+})
+
+describe('firMiddleware `on_child_moved` listen new values', () => {
+  // test('listen ref `/test` for moved child sort by height', done => {
+  //   firebase.database().ref('test').set({
+  //     2: {height: 100},
+  //     1: {height: 200}
+  //   })
+  //   const anAction = {
+  //     [CALL_FIR_API]: {
+  //       types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+  //       ref: (db) => db.ref('/test/1').orderByKey(),
+  //       method: 'on_child_moved'
+  //     }
+  //   };
+  //   const doGetState = () => {};
+  //   const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+  //   const doNext = (action) => {
+  //     if (action.type === 'SUCCESS') {
+  //       expect(action.payload.val()).toEqual("bar");
+  //       action.off();
+  //       done();
+  //     }
+  //   };
+  //   const actionHandler = nextHandler(doNext);
+
+  //   actionHandler(anAction);
+  // });
+
+  // test('`/test` listen child_moved and unsubscribe', done => {
+  //   firebase.database().ref('test').set({
+  //     hello: 'world',
+  //     foo: "bar"
+  //   })
   //   const anAction = {
   //     [CALL_FIR_API]: {
   //       types: ['REQUEST', 'SUCCESS', 'FAILURE'],
   //       ref: (db) => db.ref('/test'),
-  //       method: 'on_child_changed'
+  //       method: 'on_child_moved'
   //     }
   //   };
   //   const doGetState = () => {};
@@ -619,10 +746,8 @@ describe('firMiddleware `on_child_changed` listen new values', () => {
   //     if (action.type === 'SUCCESS') {
   //       testCall();
   //       action.off();
-  //       firebase.database().ref('test').update({foo: 'bar'})
-  //         .then(() => firebase.database().ref('test').once('value'))
-  //         .then((snapShot) => {
-  //           expect(snapShot.val()).toEqual({foo: 'bar', hello: 'world'})
+  //       firebase.database().ref('test/foo').remove()
+  //         .then(() => {
   //           expect(testCall).toHaveBeenCalledTimes(1);
   //           done();
   //         })
@@ -630,6 +755,9 @@ describe('firMiddleware `on_child_changed` listen new values', () => {
   //   };
   //   const actionHandler = nextHandler(doNext);
   
-  //   actionHandler(anAction);
+  //   actionHandler(anAction)
+  //     .then(() => {
+  //       firebase.database().ref('test/hello').remove()
+  //     });
   // });
 })

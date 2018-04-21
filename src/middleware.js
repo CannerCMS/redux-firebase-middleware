@@ -47,7 +47,11 @@ export default (firebase: any) => {
       function listenerMethods(type) {
         const cb = async (dataSnapshot, prevChildKey) => {
           const newSuccessType = Object.assign({}, successType);
-          if (type === 'child_added' || type === 'child_changed' || type === 'child_moved') {
+          if (
+            type === "child_added" ||
+            type === "child_changed" ||
+            type === "child_moved"
+          ) {
             dataSnapshot = {
               childSnapshot: dataSnapshot,
               prevChildKey

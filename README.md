@@ -1,5 +1,5 @@
 # redux-firebase-middleware [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> redux middleware for firebase, support native web API or react-native-firebase API.
+> Redux middleware for firebase, support native web API or react-native-firebase API.
 
 ## Installation
 
@@ -60,58 +60,37 @@ const finalCreateStore = compose(
 
 ```
 
-### action
+### Basic operations (Read, and write data)
 
 dispatching a firMiddleware action.
 
-- types: action constants types
-- ref: firebase reference
-- method: firebase get value method, support `once_value`, `once_child_added`, `once_child_changed`, `once_child_removed`, `once_child_moved`
+- types **(Array<request, success, failure>)** : action constants types
+- ref **((firebase.database) => firebase.database.Reference)**: Instance of firebase reference
+- method: could be one of
+  * `once_value`: https://firebase.google.com/docs/reference/js/firebase.database.Reference#once
+  * `set`: https://firebase.google.com/docs/reference/js/firebase.database.Reference#set
+  * `update`: https://firebase.google.com/docs/reference/js/firebase.database.Reference#update
+  * `remove`: https://firebase.google.com/docs/reference/js/firebase.database.Reference#remove
 
 ```js
 const {CALL_FIR_API} = require('redux-firebase-middleware');
 
+export const GET_MY_REF = [
+  'GET_MY_REF_REQUEST', // -------> first, must be request type
+  'GET_MY_REF_SUCCESS', // -------> second, must be success type
+  'GET_MY_REF_FAILURE', // -------> third, must be failure type
+];
+
 function callAnAction() {
   return dispatch({[CALL_FIR_API]: {
     types: GET_MY_REF, // -----> normally this should put in constants, see `constants`(next seciton) for more info
-    ref: 'my_firebase_ref/ref/ref', // ----> your firebase reference path
+    ref: (db) => db.ref('test/path1'), // ----> your firebase reference path
     method: 'once_value',
   }});
 }
 ```
 
-### Constants
-
-##### Default payload
-
-`data.val()` will return as default.
-
-```js
-export const GET_CALC_CAR_CATEGORY = [
-  'GET_MY_REF_REQUEST', // -------> first, must be request type
-  'GET_MY_REF_SUCCESS', // -------> second, must be success type
-  'GET_MY_REF_FAILURE', // -------> third, must be failure type
-];
-```
-
-##### Customized payload
-
-```js
-export const GET_CALC_CAR_CATEGORY = [
-  'GET_MY_REF_REQUEST', // -------> first, must be request type
-  {
-    type: 'GET_MY_REF_SUCCESS', // ------> second, must be success type
-    payload: (action: FirAPI, state: GetState, data: any) => {
-      // you can do what ever you want, transforming data or manipulating data .... etc
-      // get firebase data called `data.val()`
-      return data.val();
-    },
-  },
-  'GET_MY_REF_FAILURE', // -------> third, must be failure type
-];
-```
-
-### Reducer
+***Reducers***
 
 ```js
 export default function reducer(state: calcState = initialState, action: FSA) {
@@ -131,15 +110,90 @@ export default function reducer(state: calcState = initialState, action: FSA) {
 }
 ```
 
-## Inspired
+### Listener events (Reading and writing lists)
 
-This is highly inspired by `redux-api-middleware`
+dispatching a firMiddleware listener actions.
+
+- types ***(Array<request, success, failure>)***: action constants types
+- ref ***((firebase.database) => firebase.database.Reference)***: Instance of firebase reference
+- method: could be one of, please reference to: https://firebase.google.com/docs/reference/js/firebase.database.Reference#on
+  * `on_value`
+  * `on_child_added`
+  * `on_child_changed`
+  * `on_child_removed`
+  * `on_child_moved`
+
+```js
+const {CALL_FIR_API} = require('redux-firebase-middleware');
+
+export const GET_MY_REF = [
+  'GET_MY_REF_REQUEST', // -------> first, must be request type
+  'GET_MY_REF_SUCCESS', // -------> second, must be success type
+  'GET_MY_REF_FAILURE', // -------> third, must be failure type
+];
+
+function callAnAction() {
+  return dispatch({[CALL_FIR_API]: {
+    types: GET_MY_REF, // -----> normally this should put in constants, see `constants`(next seciton) for more info
+    ref: (db) => db.ref('test/path1'), // ----> your firebase reference path
+    method: 'on_value',
+  }});
+}
+```
+
+To remove the listener, you'll get `off` method in actions' reducer.
+
+***Reducers***
+
+```js
+export default function reducer(state: calcState = initialState, action: FSA) {
+  // or if you're using event listeners you'll get additional `off` method to remove the listening event by calling `off()` 
+  const {type, payload, off} = action
+
+  switch (type) {
+    case 'GET_MY_REF_REQUEST':
+      // update request state
+
+    case 'GET_MY_REF_SUCCESS':
+      // update success state
+      // you can get data from payload.
+
+    case 'GET_MY_REF_FAILURE':
+      // update failure state
+
+    case 'REMOVE_LISTENER':
+      // call off method to unlisten the event
+      off();
+  }
+}
+```
+
+#### Customized payload
+
+```js
+export const GET_CALC_CAR_CATEGORY = [
+  'GET_MY_REF_REQUEST', // -------> first, must be request type
+  {
+    type: 'GET_MY_REF_SUCCESS', // ------> second, must be success type
+    payload: (action: FirAPI, state: GetState, data: any) => {
+      // you can do what ever you want, transforming data or manipulating data .... etc
+      // get firebase data called `data.val()`
+      return data.val();
+    },
+  },
+  'GET_MY_REF_FAILURE', // -------> third, must be failure type
+];
+```
+
+## Credits
+
+Inspired by `redux-api-middleware`
 
 https://github.com/agraboso/redux-api-middleware
 
 ## License
 
-Apache-2.0 © [chilijung](https://github.com/chilijung)
+MIT © [chilijung](https://github.com/chilijung)
 
 
 [npm-image]: https://badge.fury.io/js/redux-firebase-middleware.svg
