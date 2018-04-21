@@ -3,6 +3,10 @@
 
 **NOTE: Only support for Firebase realtime database at this moment, welcome PRs for supporting Firestore**
 
+## Why?
+
+Firebase SDK is hard to achieve strict unidirectional data flow in Redux. If you have a hard time manage your Redux states from Firebase realtime database to your Redux store. This middleware help you seamlessly integrate Firebase with Redux workflow.
+
 ## Installation
 
 ```sh
