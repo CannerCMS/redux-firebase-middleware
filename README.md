@@ -117,7 +117,7 @@ export default function reducer(state: calcState = initialState, action: FSA) {
 dispatching a firMiddleware listener actions.
 
 - types **(Array<request, success, failure>)** : action constants types
-- ref **((firebase.database) => firebase.database.Reference)**: Instance of firebase reference
+- ref **((firebase.database) => firebase.database.Reference | firebase.database.Query)**: Instance of firebase reference or firebase query
 - method: could be one of, please reference to: https://firebase.google.com/docs/reference/js/firebase.database.Reference#on
   * `on_value`
   * `on_child_added`

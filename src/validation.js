@@ -88,10 +88,13 @@ export function validateFirAction(action: FirAPI) {
     validationErrors.push("[CALL_API].ref property must be a function");
   } else if (
     typeof ref === "function" &&
-    !(ref(db) instanceof firebase.database.Reference)
+    // check if is a Firebase Reference
+    !(ref(db) instanceof firebase.database.Reference) &&
+    // check if is a Firebase Query
+    !(ref(db) instanceof firebase.database.Query)
   ) {
     validationErrors.push(
-      "[CALL_API].ref property must be an instance of firebase.database.Reference"
+      "[CALL_API].ref property must be an instance of firebase.database.Reference or firebase.database.Query"
     );
   }
 

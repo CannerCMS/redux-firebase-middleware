@@ -210,7 +210,7 @@ describe('firMiddleware must dispatch an error request when FirAction have wrong
     const doNext = (action) => {
       expect(action.type).toBe('REQUEST');
       expect(action.payload.name).toBe('InvalidFirAction');
-      expect(action.payload.validationErrors[0]).toBe('[CALL_API].ref property must be an instance of firebase.database.Reference');
+      expect(action.payload.validationErrors[0]).toBe('[CALL_API].ref property must be an instance of firebase.database.Reference or firebase.database.Query');
       expect(action.error).toBe(true);
       done();
     };
@@ -288,7 +288,7 @@ describe('firMiddleware must dispatch an error request when FirAction have wrong
 })
 
 
-describe('firMiddleware get value once', () => {
+describe('firMiddleware get value from firebase reference once', () => {
   test('get the `/test` value once', done => {
     firebase.database().ref('test').set({hello: 'world'})
     const anAction = {
@@ -447,6 +447,33 @@ describe('firMiddleware `on_value` listen new values', () => {
             expect(testCall).toHaveBeenCalledTimes(1);
             done();
           })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
+  
+    actionHandler(anAction);
+  });
+
+  test('`/test` listen value with query ', done => {
+    firebase.database().ref('test').set({
+      howard: {score: 140},
+      bob: {score: 99},
+      william: {score: 120}
+    })
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test').orderByChild("score").equalTo(120),
+        method: 'on_value'
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        expect(action.payload.val()).toEqual({"william": {"score": 120}});
+        action.off();
+        done();
       }
     };
     const actionHandler = nextHandler(doNext);
@@ -700,32 +727,36 @@ describe('firMiddleware `on_child_removed` listen new values', () => {
   });
 })
 
-describe('firMiddleware `on_child_moved` listen new values', () => {
-  // test('listen ref `/test` for moved child sort by height', done => {
-  //   firebase.database().ref('test').set({
-  //     2: {height: 100},
-  //     1: {height: 200}
-  //   })
-  //   const anAction = {
-  //     [CALL_FIR_API]: {
-  //       types: ['REQUEST', 'SUCCESS', 'FAILURE'],
-  //       ref: (db) => db.ref('/test/1').orderByKey(),
-  //       method: 'on_child_moved'
-  //     }
-  //   };
-  //   const doGetState = () => {};
-  //   const nextHandler = firMiddleware(firebase)({ getState: doGetState });
-  //   const doNext = (action) => {
-  //     if (action.type === 'SUCCESS') {
-  //       expect(action.payload.val()).toEqual("bar");
-  //       action.off();
-  //       done();
-  //     }
-  //   };
-  //   const actionHandler = nextHandler(doNext);
+// describe('firMiddleware `on_child_moved` listen new values', () => {
+//   test('listen ref `/test` for moved child sort by height', done => {
+//     firebase.database().ref('test').set({
+//       2: {height: 100},
+//       1: {height: 200}
+//     })
+//     const anAction = {
+//       [CALL_FIR_API]: {
+//         types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+//         ref: (db) => db.ref('/test'),
+//         method: 'on_child_moved'
+//       }
+//     };
+//     const doGetState = () => {};
+//     const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+//     const doNext = (action) => {
+//       console.log(action)
+//       if (action.type === 'SUCCESS') {
+//         expect(action.payload.val()).toEqual("bar");
+//         action.off();
+//         done();
+//       }
+//     };
+//     const actionHandler = nextHandler(doNext);
 
-  //   actionHandler(anAction);
-  // });
+//     actionHandler(anAction)
+//       .then(() => {
+//         firebase.database().ref('/test').orderByChild("height")
+//       });
+//   });
 
   // test('`/test` listen child_moved and unsubscribe', done => {
   //   firebase.database().ref('test').set({
@@ -760,4 +791,4 @@ describe('firMiddleware `on_child_moved` listen new values', () => {
   //       firebase.database().ref('test/hello').remove()
   //     });
   // });
-})
+// })
