@@ -99,16 +99,16 @@ export default (firebase: any) => {
             return;
           case "on_child_added":
             listenerMethods("child_added");
-            break;
+            return;
           case "on_child_changed":
             listenerMethods("child_changed");
-            break;
+            return;
           case "on_child_removed":
             listenerMethods("child_removed");
-            break;
+            return;
           case "on_child_moved":
             listenerMethods("child_moved");
-            break;
+            return;
           default:
             throw new Error("Invalid method: ", method);
         }
