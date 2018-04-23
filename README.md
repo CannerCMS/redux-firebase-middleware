@@ -35,7 +35,7 @@ const config = {
   messagingSenderId: 'xxxxxxxxxxx',
 };
 
-firebase.initializeApp(config).database();
+firebase.initializeApp(config);
 
 const finalCreateStore = compose(
   applyMiddleware(thunk),
