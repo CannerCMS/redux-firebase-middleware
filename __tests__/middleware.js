@@ -727,68 +727,67 @@ describe('firMiddleware `on_child_removed` listen new values', () => {
   });
 })
 
-// describe('firMiddleware `on_child_moved` listen new values', () => {
-//   test('listen ref `/test` for moved child sort by height', done => {
-//     firebase.database().ref('test').set({
-//       2: {height: 100},
-//       1: {height: 200}
-//     })
-//     const anAction = {
-//       [CALL_FIR_API]: {
-//         types: ['REQUEST', 'SUCCESS', 'FAILURE'],
-//         ref: (db) => db.ref('/test'),
-//         method: 'on_child_moved'
-//       }
-//     };
-//     const doGetState = () => {};
-//     const nextHandler = firMiddleware(firebase)({ getState: doGetState });
-//     const doNext = (action) => {
-//       console.log(action)
-//       if (action.type === 'SUCCESS') {
-//         expect(action.payload.val()).toEqual("bar");
-//         action.off();
-//         done();
-//       }
-//     };
-//     const actionHandler = nextHandler(doNext);
+describe('firMiddleware `on_child_moved` listen new values', () => {
+  test('listen ref `/test` for moved child sort by height', done => {
+    firebase.database().ref('test').set({
+      howard: {height: 100},
+      bob: {height: 200}
+    })
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test').orderByChild("height"),
+        method: 'on_child_moved'
+      }
+    };
+    const doGetState = () => {};
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        expect(action.payload.childSnapshot.val()).toEqual({height: 50});
+        action.off();
+        done();
+      }
+    };
+    const actionHandler = nextHandler(doNext);
 
-//     actionHandler(anAction)
-//       .then(() => {
-//         firebase.database().ref('/test').orderByChild("height")
-//       });
-//   });
+    actionHandler(anAction)
+      .then(() => {
+        firebase.database().ref('/test/bob/height').set(50)
+      });
+  });
 
-  // test('`/test` listen child_moved and unsubscribe', done => {
-  //   firebase.database().ref('test').set({
-  //     hello: 'world',
-  //     foo: "bar"
-  //   })
-  //   const anAction = {
-  //     [CALL_FIR_API]: {
-  //       types: ['REQUEST', 'SUCCESS', 'FAILURE'],
-  //       ref: (db) => db.ref('/test'),
-  //       method: 'on_child_moved'
-  //     }
-  //   };
-  //   const doGetState = () => {};
-  //   const testCall = jest.fn();
-  //   const nextHandler = firMiddleware(firebase)({ getState: doGetState });
-  //   const doNext = (action) => {
-  //     if (action.type === 'SUCCESS') {
-  //       testCall();
-  //       action.off();
-  //       firebase.database().ref('test/foo').remove()
-  //         .then(() => {
-  //           expect(testCall).toHaveBeenCalledTimes(1);
-  //           done();
-  //         })
-  //     }
-  //   };
-  //   const actionHandler = nextHandler(doNext);
+  test('`/test` listen child_moved and unsubscribe', done => {
+    firebase.database().ref('test').set({
+      howard: {height: 100},
+      bob: {height: 200}
+    })
+    const anAction = {
+      [CALL_FIR_API]: {
+        types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        ref: (db) => db.ref('/test').orderByChild("height"),
+        method: 'on_child_moved'
+      }
+    };
+    const doGetState = () => {};
+    const testCall = jest.fn();
+    const nextHandler = firMiddleware(firebase)({ getState: doGetState });
+    const doNext = (action) => {
+      if (action.type === 'SUCCESS') {
+        testCall();
+        action.off();
+        firebase.database().ref('/test/bob/height').set(200)
+          .then(() => {
+            expect(testCall).toHaveBeenCalledTimes(1);
+            done();
+          })
+      }
+    };
+    const actionHandler = nextHandler(doNext);
   
-  //   actionHandler(anAction)
-  //     .then(() => {
-  //       firebase.database().ref('test/hello').remove()
-  //     });
-  // });
-// })
+    actionHandler(anAction)
+      .then(() => {
+        firebase.database().ref('/test/bob/height').set(50)
+      });
+  });
+})
